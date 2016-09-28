@@ -1,15 +1,19 @@
 from django.conf.urls import url
+from social.utils import setting_name
 
-from . import views
+from .views import SocialTokenOnlyAuthView, SocialTokenUserAuthView,
 
+
+extra = getattr(settings, setting_name('TRAILING_SLASH'), True) and '/' or ''
 
 urlpatterns = (
-    # returns token + user_data
-    url(r'^social/token_user/(?:(?P<provider>[a-zA-Z0-9_-]+)/?)?$',
-        views.SocialTokenUserAuthView.as_view(),
-        name='login_social_token_user'),
-
     # returns token only
-    url(r'^social/token/(?:(?P<provider>[a-zA-Z0-9_-]+)/?)?$',
-        views.SocialTokenOnlyAuthView.as_view(),
-        name='login_social_token'),)
+    url(r'^login/(?P<provider>[^/]+){0}$'.format(extra),
+        SocialTokenOnlyAuthView.as_view(),
+        name='login_social_token'),
+
+    # returns token + user_data
+    url(r'^login/(?P<provider>[^/]+){0}$'.format(extra),
+        SocialTokenUserAuthView.as_view(),
+        name='login_social_token_user'),
+)
