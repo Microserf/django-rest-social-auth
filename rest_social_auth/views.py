@@ -85,6 +85,13 @@ class BaseSocialAuthView(GenericAPIView):
         cookies.
         """
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        try:
+            self.strategy.finalize_response(response)
+        except AttributeError:
+            pass
+        return super(BaseSocialAuthView, self).finalize_response(request, response, *args, **kwargs)
+
     def get_backend_name(self, request, *args, **kwargs):
         input_data = request.data
         if 'provider' in input_data:
