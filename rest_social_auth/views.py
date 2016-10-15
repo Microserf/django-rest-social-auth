@@ -41,11 +41,6 @@ def load_strategy(request=None):
     return get_strategy(STRATEGY, STORAGE, request)
 
 
-@psa(REDIRECT_URI, load_strategy=load_strategy)
-def decorate_request(request, backend):
-    pass
-
-
 class BaseSocialAuthView(GenericAPIView):
     """
     View will login or signin (create) the user from social oauth2.0 provider.
@@ -165,7 +160,6 @@ class BaseSocialAuthView(GenericAPIView):
             l.exception(u'%s; %s', error, err_msg)
 
     def oauth_v1(self):
-        assert hasattr(self.request, 'backend'), 'Don\'t call this method before decorate_request'
         return isinstance(self.request.backend, BaseOAuth1)
 
     @method_decorator(never_cache)
