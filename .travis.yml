@@ -4,18 +4,16 @@ python:
   - 2.7
 
 env:
-  - TOXENV=py34-django17
-  - TOXENV=py34-django18
-  - TOXENV=py34-django19
-  - TOXENV=py35-django18
-  - TOXENV=py35-django19
-  - TOXENV=py27-django17
-  - TOXENV=py27-django18
-  - TOXENV=py27-django19
-
-branches:
-    only:
-        - master
+  - TOXENV=py34-django110
+  - TOXENV=py34-django111
+  - TOXENV=py34-django20
+  - TOXENV=py35-django110
+  - TOXENV=py35-django111
+  - TOXENV=py35-django20
+  - TOXENV=py36-django111
+  - TOXENV=py36-django20
+  - TOXENV=py27-django110
+  - TOXENV=py27-django111
 
 install: pip install --quiet tox
 
@@ -23,7 +21,7 @@ install: pip install --quiet tox
 script: tox
 
 after_script:
-    - if [ $TOXENV == "py27-django19" ]; then
+    - if [ $TOXENV == "py27-django111" ]; then
         pip install --quiet coveralls;
         coveralls;
       fi
@@ -34,3 +32,4 @@ addons:
       - deadsnakes
     packages:
       - python3.5
+      - python3.6

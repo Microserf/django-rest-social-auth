@@ -12,10 +12,11 @@ OAuth signin with django rest framework.
 Requirements
 -----------
 
-- python (2.7, 3.4, 3.5)
-- django (1.7, 1.8, 1.9)
-- djangorestframework (>= 3.1)
-- python-social-auth (>=0.2.9)
+- python (2.7, 3.4, 3.5, 3.6)
+- django (1.10, 1.11, 2.0)
+- djangorestframework (>=3.1, <4.0)
+- social-auth-core (>=1.7.0, <2.0)
+- social-auth-app-django (>=2.1, <3.0)
 - [optional] djangorestframework-jwt (>=1.7.2)
 
 Release notes
@@ -35,7 +36,7 @@ That's it.
 I can't find such util for [django rest framework](http://www.django-rest-framework.org/).
 There are packages (for example [django-rest-auth](https://github.com/Tivix/django-rest-auth)), that take access_token, not the code.
 Also, i've used to work with awesome library [python-social-auth](https://github.com/omab/python-social-auth),
-so it will be nice to use it again. In fact, most of the work is done by this package.
+so it will be nice to use it again (now it is split into [social-core](https://github.com/python-social-auth/social-core) and [social-app-django](https://github.com/python-social-auth/social-app-django)). In fact, most of the work is done by this package.
 Current util brings a little help to integrate django-rest-framework and python-social-auth.
 
 Quick start
@@ -53,11 +54,11 @@ Quick start
             ...
             'rest_framework',
             'rest_framework.authtoken',  # only if you use token authentication
-            'social.apps.django_app.default',  # python social auth
+            'social_django',  # django social auth
             'rest_social_auth',  # this package
         )
 
-    python-social-auth settings, look [documentation](http://psa.matiasaguirre.net/docs/configuration/django.html) for more details
+    social auth settings, look [documentation](http://python-social-auth.readthedocs.io/en/latest/configuration/django.html) for more details
 
         SOCIAL_AUTH_FACEBOOK_KEY = 'your app client id'
         SOCIAL_AUTH_FACEBOOK_SECRET = 'your app client secret'
@@ -66,7 +67,7 @@ Quick start
 
 
         AUTHENTICATION_BACKENDS = (
-            'social.backends.facebook.FacebookOAuth2',
+            'social_core.backends.facebook.FacebookOAuth2',
             # and maybe some others ...
             'django.contrib.auth.backends.ModelBackend',
         )
@@ -275,11 +276,11 @@ List of oauth providers
 
 OAuth 1.0 and OAuth 2.0 providers are supported.
 
-Look [python-social-auth](https://github.com/omab/python-social-auth#user-content-auth-providers) for full list.
+Look [python-social-auth](http://python-social-auth.readthedocs.io/en/latest/backends/index.html#social-backends) for full list.
 Name of provider is taken from corresponding `backend.name` property of
 particular backed class in python-social-auth.
 
-For example for [facebook backend](https://github.com/omab/python-social-auth/blob/master/social/backends/facebook.py#L19)
+For example for [facebook backend](https://github.com/python-social-auth/social-core/blob/master/social_core/backends/facebook.py#L22)
 we see:
 
     class FacebookOAuth2(BaseOAuth2):
@@ -296,7 +297,7 @@ Instagram | instagram
 Github    | github
 Yandex    | yandex-oauth2
 Twitter   | twitter
-[Others](https://github.com/omab/python-social-auth#user-content-auth-providers) | ...
+[Others](http://python-social-auth.readthedocs.io/en/latest/backends/index.html#social-backends) | [...](http://python-social-auth.readthedocs.io/en/latest/backends/index.html#social-backends)
 
 
 Settings
@@ -360,13 +361,18 @@ Settings
     I.e. if this settings is defined, other will be ignored.
     But `redirect_uri` param from request has higher priority than any setting.
 
+- `REST_SOCIAL_LOG_AUTH_EXCEPTIONS`
+
+    Default: `True`
+
+    When `False` will not log social auth authentication exceptions.
 
 
 Customization
 -------------
 
 First of all, customization provided by python-social-auth is also avaliable.
-For example, use nice mechanism of [pipeline](http://psa.matiasaguirre.net/docs/pipeline.html) to do any action you need during login/signin.
+For example, use nice mechanism of [pipeline](http://python-social-auth.readthedocs.io/en/latest/pipeline.html) to do any action you need during login/signin.
 
 Second, you can override any method from current package.
 Specify serializer for each view by subclassing the view.
@@ -418,7 +424,7 @@ There is an [example project](https://github.com/st4lk/django-rest-social-auth/t
 
 - create database (sqlite3)
 
-        python manage.py syncdb
+        python manage.py migrate
 
 - run development server
 
@@ -446,3 +452,6 @@ Contributors
 - Deshraj Yadav, [DESHRAJ](https://github.com/DESHRAJ)
 - georgewhewell, [georgewhewell](https://github.com/georgewhewell)
 - Ahmed Sa3d, [zee93](https://github.com/zee93)
+- Olle Vidner, [ovidner](https://github.com/ovidner)
+- MounirMesselmeni, [MounirMesselmeni](https://github.com/MounirMesselmeni)
+- Tuomas Virtanen, [katajakasa](https://github.com/katajakasa)

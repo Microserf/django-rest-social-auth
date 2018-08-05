@@ -10,7 +10,10 @@ def __read(fname):
     except IOError:
         return ''
 
+
 if sys.argv[-1] == 'publish':
+    # TODO: Need python 3.4.6+, 3.5.3+, Python 3.6+ here, add a check
+    # https://packaging.python.org/guides/migrating-to-pypi-org/#uploading
     os.system('pandoc --from=markdown --to=rst --output=README.rst README.md')
     os.system('pandoc --from=markdown --to=rst --output=RELEASE_NOTES.rst RELEASE_NOTES.md')
     os.system('python setup.py sdist upload')
@@ -56,6 +59,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Utilities',
     ],
 )

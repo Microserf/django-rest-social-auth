@@ -1,6 +1,42 @@
 rest_social_auth release notes
 ==============================
 
+master
+------
+
+v1.3.1
+------
+- Fix Django 2.0 support
+
+v1.3.0
+------
+- Add Django 2.0 support
+- Drop Django 1.8, 1.9 support
+
+Issues: #58
+
+v1.2.0
+------
+- Add Python 3.6 and Django 1.11 support
+
+Issues #54
+
+v1.1.0
+------
+- Update docs
+- Add new setting `REST_SOCIAL_LOG_AUTH_EXCEPTIONS`
+
+Issues #42
+
+v1.0.0
+------
+- Add Django 1.10 support
+- Drop Django 1.7 support
+- Add social-auth-core, social-auth-app-django dependencies
+- Drop python-social-auth dependency
+
+Issues: #33, #35, #37, #38
+
 v0.5.0
 ------
 - Handle HttpResponses returned by the pipeline

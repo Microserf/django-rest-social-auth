@@ -13,20 +13,22 @@ from django.utils.encoding import iri_to_uri
 from django.utils.six.moves.urllib.parse import urljoin
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from requests.exceptions import HTTPError
+from social_django.utils import psa, STORAGE
+from social_django.views import _do_login as social_auth_login
+from social_core.backends.oauth import BaseOAuth1
+from social_core.utils import get_strategy, parse_qs, user_is_authenticated
+from social_core.exceptions import AuthException
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from social.apps.django_app.utils import psa, STORAGE
-from social.apps.django_app.views import _do_login as social_auth_login
-from social.backends.oauth import BaseOAuth1
-from social.exceptions import AuthException
-from social.strategies.utils import get_strategy
-from social.utils import partial_pipeline_data, user_is_authenticated, parse_qs
+from requests.exceptions import HTTPError
 
-from .serializers import OAuth2InputSerializer, OAuth1InputSerializer, UserSerializer, TokenSerializer, UserTokenSerializer, JWTSerializer, UserJWTSerializer
+from .serializers import (
+    OAuth2InputSerializer, OAuth1InputSerializer, UserSerializer,
+    TokenSerializer, UserTokenSerializer, JWTSerializer, UserJWTSerializer
+)
 
 
 l = logging.getLogger(__name__)
@@ -34,6 +36,7 @@ l = logging.getLogger(__name__)
 
 DOMAIN_FROM_ORIGIN = getattr(settings, 'REST_SOCIAL_DOMAIN_FROM_ORIGIN', True)
 REDIRECT_URI = getattr(settings, 'REST_SOCIAL_OAUTH_REDIRECT_URI', '/')
+LOG_AUTH_EXCEPTIONS = getattr(settings, 'REST_SOCIAL_LOG_AUTH_EXCEPTIONS', True)
 STRATEGY = getattr(settings, 'REST_SOCIAL_STRATEGY', 'rest_social_auth.strategy.DRFStrategy')
 
 
@@ -98,6 +101,7 @@ class BaseSocialAuthView(GenericAPIView):
             return kwargs.pop('provider')
 
     def get_object(self):
+        user = self.request.user
         is_authenticated = user_is_authenticated(self.request.user)
         user = is_authenticated and user or None
 
@@ -121,8 +125,8 @@ class BaseSocialAuthView(GenericAPIView):
 
     def get_redirect_uri(self, manual_redirect_uri):
         if not manual_redirect_uri:
-            manual_redirect_uri = getattr(settings,
-                'REST_SOCIAL_OAUTH_ABSOLUTE_REDIRECT_URI', None)
+            manual_redirect_uri = getattr(
+                settings, 'REST_SOCIAL_OAUTH_ABSOLUTE_REDIRECT_URI', None)
         return manual_redirect_uri
 
     def get_serializer_class_in(self):
@@ -185,7 +189,8 @@ class BaseSocialAuthView(GenericAPIView):
 
     def respond_error(self, error):
         if isinstance(error, Exception):
-            self.log_exception(error)
+            if not isinstance(error, AuthException) or LOG_AUTH_EXCEPTIONS:
+                self.log_exception(error)
         else:
             l.error(error)
         return Response(status=status.HTTP_400_BAD_REQUEST)
